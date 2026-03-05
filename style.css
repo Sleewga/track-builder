@@ -23,10 +23,25 @@
 
 ul {
   list-style: none;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.ul * {
+  width: 100%;
+}
+
+li {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }
 
 body {
   background-color: var(--primary-bg-color);
+  margin: 2rem;
 }
 
 .hidden {
@@ -52,6 +67,10 @@ body {
   border-radius: 1rem;
 }
 
+.container-horizontal {
+  flex-direction: row;
+}
+
 .container-sm {
   padding: 1rem;
   border-radius: 0.5rem;
@@ -63,6 +82,11 @@ body {
 }
 
 .container-bg {
+  padding: 5rem;
+  border-radius: 2rem;
+}
+
+.container-fl {
   padding: 5rem;
   border-radius: 2rem;
 }
@@ -82,15 +106,7 @@ body {
 }
 
 .vertical-list {
-  display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 100%;
-  gap: 1rem;
-}
-
-.vertical-list * {
-  width: 100%;
 }
 
 select {
@@ -126,4 +142,14 @@ select {
 
 .tile-water {
   background: var(--water);
+}
+
+.split-view {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.horizontal-list {
+  flex-direction: row;
 }

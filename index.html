@@ -36,7 +36,27 @@
           </ul>
         </form>
       </section>
-      <section class="hidden" id="game">
+      <section class="container container-fl split-view hidden" id="game">
+        <section id="track-menu">
+          <ul class="horizontal-list">
+            <li>
+              <button class="container container-sm btn" id="save-track">
+                <span>Save Track</span>
+              </button>
+            </li>
+            <li class="container container-sm container-horizontal">
+              <select id="load-list"></select>
+              <button class="container container-sm btn" id="load-track">
+                <span>Load Track</span>
+              </button>
+            </li>
+            <li>
+              <button class="container container-sm btn" id="export-track">
+                <span>Export Track</span>
+              </button>
+            </li>
+          </ul>
+        </section>
         <section id="track"></section>
       </section>
     </main>

@@ -35,7 +35,7 @@ export class MainMenuManager {
 
       this.#newGameElement.classList.add("hidden");
       const size = document.getElementById("size-selection").value;
-      resolve(new GameManager(size));
+      resolve(new GameManager(size, false));
     });
   }
 
