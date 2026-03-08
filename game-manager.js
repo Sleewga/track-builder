@@ -34,21 +34,32 @@ export class GameManager {
   }
 
   #trackMenuHandler() {
-    this.#trackMenuElement.addEventListener("click", () => {
+    this.#trackMenuElement.addEventListener("click", (event) => {
       const button = event.target.closest("button");
       if (!button) return;
 
       if (button.id === "save-track") {
         this.#saveTrack();
       } else if (button.id === "load-track") {
+        const trackName = this.#getSelectedTrackName();
+        this.#loadTrack(trackName);
+      } else if (button.id === "export-track") {
+        this.#exportTrack();
       }
     });
+
+    document
+      .getElementById("import-track")
+      .addEventListener("change", (event) => {
+        this.#importTrack(event);
+      });
   }
 
   #loadSavedTracksOptions() {
     const loadList = document.getElementById("load-list");
 
     let savedTracks = this.#getSavedTracks();
+    loadList.innerHTML = "";
     const documentFrag = document.createDocumentFragment();
 
     savedTracks.forEach((track) => {
@@ -60,27 +71,46 @@ export class GameManager {
     loadList.appendChild(documentFrag);
   }
 
-  #loadTrack() {
+  #getSelectedTrackName() {
+    const option = document.getElementById("load-list").value;
+    return option;
+  }
+
+  #loadTrack(trackName) {
     const savedTracks = this.#getSavedTracks();
+    const track = savedTracks.find((t) => t.name === trackName);
+    if (!track) return;
+
+    this.#map = track.map.map((row) =>
+      row.map((tileType) => {
+        const tile = document.createElement("div");
+        tile.classList.add("tile", `tile-${tileType}`);
+        return tile;
+      }),
+    );
+
+    this.#trackMapElement.innerHTML = "";
+    this.#map.forEach((row) =>
+      row.forEach((tile) => this.#trackMapElement.appendChild(tile)),
+    );
   }
 
   #saveTrack() {
-    if (this.#isFromSaved) {
-      this.#getSavedTracks();
-    } else {
-      const name = prompt("Enter name:");
-      const newTrack = {
-        name: name,
-        map: this.#map,
-      };
+    const name = prompt("Enter name:");
 
-      let savedTracks = this.#getSavedTracks();
-      if (!savedTracks) {
-        savedTracks = [];
-      }
-      savedTracks.push(newTrack);
-      localStorage.setItem("savedTracks", JSON.stringify(savedTracks));
-    }
+    const serializedMap = this.#map.map((row) =>
+      row.map((tile) => {
+        if (tile.classList.contains("tile-road")) return "road";
+        if (tile.classList.contains("tile-water")) return "water";
+        return "grass";
+      }),
+    );
+
+    const newTrack = { name, map: serializedMap };
+    let savedTracks = this.#getSavedTracks();
+    savedTracks.push(newTrack);
+    localStorage.setItem("savedTracks", JSON.stringify(savedTracks));
+    this.#loadSavedTracksOptions();
   }
 
   #loadMap() {
@@ -136,6 +166,63 @@ export class GameManager {
 
   #getSavedTracks() {
     const tracks = localStorage.getItem("savedTracks");
-    return JSON.parse(tracks);
+    let converted = JSON.parse(tracks);
+    if (!converted) {
+      converted = [];
+    }
+    return converted;
+  }
+
+  #exportTrack() {
+    const serializedMap = this.#map.map((row) =>
+      row.map((tile) => {
+        if (tile.classList.contains("tile-road")) return "road";
+        if (tile.classList.contains("tile-water")) return "water";
+        return "grass";
+      }),
+    );
+
+    const name = prompt("Enter export name:") || "track";
+    const data = JSON.stringify({ name, map: serializedMap });
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${name}.json`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  }
+
+  #importTrack(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const track = JSON.parse(e.target.result);
+
+        this.#map = track.map.map((row) =>
+          row.map((tileType) => {
+            const tile = document.createElement("div");
+            tile.classList.add("tile", `tile-${tileType}`);
+            return tile;
+          }),
+        );
+
+        this.#trackMapElement.innerHTML = "";
+        this.#trackMapElement.style.gridTemplateColumns = `repeat(${track.map[0].length}, 2rem)`;
+        this.#map.forEach((row) =>
+          row.forEach((tile) => this.#trackMapElement.appendChild(tile)),
+        );
+
+        event.target.value = "";
+      } catch {
+        alert("Invalid track file.");
+      }
+    };
+    reader.readAsText(file);
   }
 }
