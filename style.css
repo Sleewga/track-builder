@@ -1,0 +1,155 @@
+:root {
+  --primary-bg-color: #171717;
+  --secondary-bg-color: #262626;
+  --primary-text-color: antiquewhite;
+  --secondary-text-color: #2c422c;
+  --secondary-text-color-light: #006100;
+
+  --grass: green;
+  --road: gray;
+  --water: blue;
+}
+
+* {
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+
+  color: var(--primary-text-color);
+  font-family: "Courier New", Courier, monospace;
+
+  transition: all 0.3s;
+}
+
+ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.ul * {
+  width: 100%;
+}
+
+li {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+body {
+  background-color: var(--primary-bg-color);
+  margin: 2rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.site-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+
+  background-color: var(--secondary-bg-color);
+  padding: 2rem;
+
+  border: solid var(--primary-text-color) 1px;
+  border-radius: 1rem;
+}
+
+.container-horizontal {
+  flex-direction: row;
+}
+
+.container-sm {
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.container-md {
+  padding: 2.5rem;
+  border-radius: 1rem;
+}
+
+.container-bg {
+  padding: 5rem;
+  border-radius: 2rem;
+}
+
+.container-fl {
+  padding: 5rem;
+  border-radius: 2rem;
+}
+
+.btn {
+  border: solid var(--primary-text-color) 1px;
+  color: var(--primary-text-color);
+
+  width: 100%;
+  cursor: pointer;
+
+  background-color: var(--secondary-text-color);
+}
+
+.btn:hover {
+  background-color: var(--secondary-text-color-light);
+}
+
+.vertical-list {
+  flex-direction: column;
+}
+
+select {
+  color: var(--primary-text-color);
+  background-color: var(--secondary-bg-color);
+  border: solid var(--primary-text-color) 1px;
+
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+#track {
+  display: grid;
+  grid-template-columns: repeat(10, 2rem);
+  grid-template-rows: repeat(10, 2rem);
+  gap: 0.5rem;
+}
+
+.tile {
+  width: 2rem;
+  height: 2rem;
+
+  cursor: pointer;
+}
+
+.tile-grass {
+  background: var(--grass);
+}
+
+.tile-road {
+  background: var(--road);
+}
+
+.tile-water {
+  background: var(--water);
+}
+
+.split-view {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.horizontal-list {
+  flex-direction: row;
+}

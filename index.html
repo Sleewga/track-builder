@@ -4,10 +4,96 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Track Builder</title>
-    <link rel="stylesheet" type="" href="style.css" />
+    <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
-    <main></main>
+  <body class="site-center">
+    <main class="">
+      <section class="container container-bg" id="game-menu">
+        <ul class="vertical-list">
+          <li>
+            <button class="container container-sm btn" id="new-track">
+              <h2>New Track</h2>
+            </button>
+          </li>
+          <li>
+            <button class="container container-sm btn" id="load-track">
+              <h2>Load Track</h2>
+            </button>
+          </li>
+          <li>
+            <button class="container container-sm btn" id="import-track">
+              <h2>Import Track</h2>
+            </button>
+          </li>
+        </ul>
+        <input
+          type="file"
+          id="import-file"
+          accept=".json"
+          style="display: none"
+        />
+      </section>
+
+      <section class="container container-md hidden" id="track-selection">
+        <ul class="vertical-list">
+          <select id="saved-tracks-list"></select>
+          <button class="container container-sm btn" id="load-selected-track">
+            <h3>Load</h3>
+          </button>
+        </ul>
+      </section>
+      <section class="container container-md hidden" id="map-creation">
+        <form>
+          <ul class="vertical-list">
+            <select id="size-selection">
+              <option value="10" selected="selected">10x10</option>
+              <option value="20">20x20</option>
+              <option value="50">50x50</option>
+            </select>
+            <button class="container container-sm btn" type="submit">
+              <h3>Start</h3>
+            </button>
+          </ul>
+        </form>
+      </section>
+      <section class="container container-fl split-view hidden" id="game">
+        <section id="track-menu">
+          <ul class="horizontal-list">
+            <li>
+              <button class="container container-sm btn" id="save-track">
+                <span>Save Track</span>
+              </button>
+            </li>
+            <li class="container container-sm container-horizontal">
+              <select id="load-list"></select>
+              <button class="container container-sm btn" id="load-track">
+                <span>Load Track</span>
+              </button>
+            </li>
+            <li>
+              <button class="container container-sm btn" id="export-track">
+                <span>Export Track</span>
+              </button>
+            </li>
+            <li>
+              <button
+                class="container container-sm btn"
+                id="import-track-ingame"
+              >
+                <span>Import Track</span>
+              </button>
+            </li>
+            <input
+              type="file"
+              id="import-file-ingame"
+              accept=".json"
+              style="display: none"
+            />
+          </ul>
+        </section>
+        <section id="track"></section>
+      </section>
+    </main>
     <script src="main.js" type="module"></script>
   </body>
 </html>
