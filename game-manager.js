@@ -5,32 +5,36 @@ export class GameManager {
   #size = 10;
   #map = [];
   #isFromSaved = false;
+  #trackName;
 
-  constructor(size, isFromSaved, map = []) {
+  constructor(size, isFromSaved, map = [], trackName = "") {
     this.#gameElement = document.getElementById("game");
     this.#trackMapElement = document.getElementById("track");
     this.#trackMenuElement = document.getElementById("track-menu");
 
     this.#size = size;
     this.#isFromSaved = isFromSaved;
-
     this.#map = map;
+    this.#trackName = trackName;
   }
 
   start() {
     this.#gameElement.classList.remove("hidden");
     this.#loadMap();
     this.#tileChangeHandler();
-
     this.#createLayout();
-
     this.#loadSavedTracksOptions();
     this.#trackMenuHandler();
+
+    document
+      .getElementById("import-file-ingame")
+      .addEventListener("change", (event) => {
+        this.#importTrack(event);
+      });
   }
 
   #createLayout() {
-    const body = document.querySelector("body");
-    body.classList.remove("site-center");
+    document.querySelector("body").classList.remove("site-center");
   }
 
   #trackMenuHandler() {
@@ -45,35 +49,53 @@ export class GameManager {
         this.#loadTrack(trackName);
       } else if (button.id === "export-track") {
         this.#exportTrack();
+      } else if (button.id === "import-track-ingame") {
+        document.getElementById("import-file-ingame").click();
       }
     });
+  }
 
-    document
-      .getElementById("import-track")
-      .addEventListener("change", (event) => {
-        this.#importTrack(event);
-      });
+  #getTileType(tile) {
+    if (tile.classList.contains("tile-road")) return "road";
+    if (tile.classList.contains("tile-water")) return "water";
+    return "grass";
+  }
+
+  #createTileElement(tileType) {
+    const tile = document.createElement("div");
+    tile.classList.add("tile", `tile-${tileType}`);
+    return tile;
+  }
+
+  #exportTrack() {
+    const name = prompt("Enter export name:") || "track";
+
+    const serializedMap = this.#map.map((row) =>
+      row.map((tile) => this.#getTileType(tile)),
+    );
+    const data = JSON.stringify({ name, map: serializedMap });
+
+    const a = document.createElement("a");
+    a.href = "data:application/json," + encodeURIComponent(data);
+    a.download = `${name}.json`;
+    a.click();
   }
 
   #loadSavedTracksOptions() {
     const loadList = document.getElementById("load-list");
-
-    let savedTracks = this.#getSavedTracks();
+    const savedTracks = this.#getSavedTracks();
     loadList.innerHTML = "";
-    const documentFrag = document.createDocumentFragment();
-
+    const fragment = document.createDocumentFragment();
     savedTracks.forEach((track) => {
       const option = document.createElement("option");
       option.innerText = track.name;
-      documentFrag.appendChild(option);
+      fragment.appendChild(option);
     });
-
-    loadList.appendChild(documentFrag);
+    loadList.appendChild(fragment);
   }
 
   #getSelectedTrackName() {
-    const option = document.getElementById("load-list").value;
-    return option;
+    return document.getElementById("load-list").value;
   }
 
   #loadTrack(trackName) {
@@ -82,14 +104,11 @@ export class GameManager {
     if (!track) return;
 
     this.#map = track.map.map((row) =>
-      row.map((tileType) => {
-        const tile = document.createElement("div");
-        tile.classList.add("tile", `tile-${tileType}`);
-        return tile;
-      }),
+      row.map((tileType) => this.#createTileElement(tileType)),
     );
 
     this.#trackMapElement.innerHTML = "";
+    this.#trackMapElement.style.gridTemplateColumns = `repeat(${track.map[0].length}, 2rem)`;
     this.#map.forEach((row) =>
       row.forEach((tile) => this.#trackMapElement.appendChild(tile)),
     );
@@ -97,17 +116,14 @@ export class GameManager {
 
   #saveTrack() {
     const name = prompt("Enter name:");
+    if (!name) return;
 
     const serializedMap = this.#map.map((row) =>
-      row.map((tile) => {
-        if (tile.classList.contains("tile-road")) return "road";
-        if (tile.classList.contains("tile-water")) return "water";
-        return "grass";
-      }),
+      row.map((tile) => this.#getTileType(tile)),
     );
-
     const newTrack = { name, map: serializedMap };
-    let savedTracks = this.#getSavedTracks();
+
+    const savedTracks = this.#getSavedTracks();
     savedTracks.push(newTrack);
     localStorage.setItem("savedTracks", JSON.stringify(savedTracks));
     this.#loadSavedTracksOptions();
@@ -117,82 +133,41 @@ export class GameManager {
     if (!this.#isFromSaved) {
       this.#createMap();
     } else {
+      this.#map = this.#map.map((row) =>
+        row.map((tileType) => this.#createTileElement(tileType)),
+      );
     }
 
     this.#trackMapElement.style.gridTemplateColumns = `repeat(${this.#size}, 2rem)`;
-
-    this.#map.forEach((row) => {
-      row.forEach((tile) => {
-        this.#trackMapElement.appendChild(tile);
-      });
-    });
+    this.#map.forEach((row) =>
+      row.forEach((tile) => this.#trackMapElement.appendChild(tile)),
+    );
   }
 
   #createMap() {
     this.#map = Array.from({ length: this.#size }, () =>
-      Array.from({ length: this.#size }, () => {
-        const tile = document.createElement("div");
-        tile.classList.add("tile");
-        tile.classList.add("tile-grass");
-        return tile;
-      }),
+      Array.from({ length: this.#size }, () =>
+        this.#createTileElement("grass"),
+      ),
     );
   }
 
-  #getSavedTrack(name) {
-    const savedTracks = this.#getSavedTracks();
-    savedTracks.forEach((track) => {
-      if (track.name === name) {
-        return track.map;
-      }
-    });
-  }
-
   #tileChangeHandler() {
-    this.#trackMapElement.addEventListener("click", () => {
+    this.#trackMapElement.addEventListener("click", (event) => {
       const tile = event.target;
       if (tile.classList.contains("tile-grass")) {
-        tile.classList.remove("tile-grass");
-        tile.classList.add("tile-road");
+        tile.classList.replace("tile-grass", "tile-road");
       } else if (tile.classList.contains("tile-road")) {
-        tile.classList.remove("tile-road");
-        tile.classList.add("tile-water");
+        tile.classList.replace("tile-road", "tile-water");
       } else if (tile.classList.contains("tile-water")) {
-        tile.classList.remove("tile-water");
-        tile.classList.add("tile-grass");
+        tile.classList.replace("tile-water", "tile-grass");
       }
     });
   }
 
   #getSavedTracks() {
     const tracks = localStorage.getItem("savedTracks");
-    let converted = JSON.parse(tracks);
-    if (!converted) {
-      converted = [];
-    }
-    return converted;
-  }
-
-  #exportTrack() {
-    const serializedMap = this.#map.map((row) =>
-      row.map((tile) => {
-        if (tile.classList.contains("tile-road")) return "road";
-        if (tile.classList.contains("tile-water")) return "water";
-        return "grass";
-      }),
-    );
-
-    const name = prompt("Enter export name:") || "track";
-    const data = JSON.stringify({ name, map: serializedMap });
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${name}.json`;
-    a.click();
-
-    URL.revokeObjectURL(url);
+    return JSON.parse(tracks) ?? [];
   }
 
   #importTrack(event) {
@@ -205,11 +180,7 @@ export class GameManager {
         const track = JSON.parse(e.target.result);
 
         this.#map = track.map.map((row) =>
-          row.map((tileType) => {
-            const tile = document.createElement("div");
-            tile.classList.add("tile", `tile-${tileType}`);
-            return tile;
-          }),
+          row.map((tileType) => this.#createTileElement(tileType)),
         );
 
         this.#trackMapElement.innerHTML = "";

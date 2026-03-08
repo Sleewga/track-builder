@@ -20,6 +20,26 @@
               <h2>Load Track</h2>
             </button>
           </li>
+          <li>
+            <button class="container container-sm btn" id="import-track">
+              <h2>Import Track</h2>
+            </button>
+          </li>
+        </ul>
+        <input
+          type="file"
+          id="import-file"
+          accept=".json"
+          style="display: none"
+        />
+      </section>
+
+      <section class="container container-md hidden" id="track-selection">
+        <ul class="vertical-list">
+          <select id="saved-tracks-list"></select>
+          <button class="container container-sm btn" id="load-selected-track">
+            <h3>Load</h3>
+          </button>
         </ul>
       </section>
       <section class="container container-md hidden" id="map-creation">
@@ -55,6 +75,20 @@
                 <span>Export Track</span>
               </button>
             </li>
+            <li>
+              <button
+                class="container container-sm btn"
+                id="import-track-ingame"
+              >
+                <span>Import Track</span>
+              </button>
+            </li>
+            <input
+              type="file"
+              id="import-file-ingame"
+              accept=".json"
+              style="display: none"
+            />
           </ul>
         </section>
         <section id="track"></section>
